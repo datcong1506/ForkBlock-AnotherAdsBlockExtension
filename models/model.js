@@ -3,14 +3,25 @@ const Schema = mongoose.Schema;
 
 const filmSchema = new Schema({
     title: { type: String, required: true },
-    genre: { type: String, required: true,
-         enum: ['Hành động', 'Kinh dị', 'Viễn tưởng', 'Lãng mạn', 'Hài hước', 'Phiêu lưu', 'Thần thoại', 'Hoạt hình', 'Tài liệu', 'Kịch tính', 'Chiến tranh', 'Thể thao', 'Nhạc kịch'] },
+    genre: {
+        type: String, required: true,
+        enum: ['Hành động', 'Kinh dị', 'Viễn tưởng', 'Lãng mạn', 'Hài hước', 'Phiêu lưu', 'Thần thoại', 'Hoạt hình', 'Tài liệu', 'Kịch tính', 'Chiến tranh', 'Thể thao', 'Nhạc kịch']
+    },
     duration: { type: Number, required: true }, // in second
     actors: { type: [String], required: true },
     releaseDate: { type: Date, required: true },
     shortDescription: { type: String, required: true },
     thumb: { type: String, required: false }, // Đường dẫn đến hình ảnh thu nhỏ
     trailer: { type: String, required: false } // Đường dẫn đến video trailer
+});
+
+
+const cinemaSchema = new Schema({
+    name: { type: String, required: true },
+    location: { type: String, required: true },
+    rooms: [{ type: Schema.Types.ObjectId, ref: 'Projection' }],
+    description: { type: String, required: true }, // Miêu tả bắt buộc
+    logo: { type: String, required: true } // Logo (link hình ảnh) bắt buộc
 });
 
 const seatSchema = new Schema({
@@ -20,7 +31,8 @@ const seatSchema = new Schema({
 
 const projectionSchema = new Schema({
     seats: [seatSchema],
-    available: { type: Boolean, required: true, default: true }
+    available: { type: Boolean, required: true, default: true },
+    cinema: { type: Schema.Types.ObjectId, ref: 'Cinema', required: true } // Thêm tham chiếu đến Rạp Chiếu
 });
 
 const showtimeSchema = new Schema({
@@ -30,8 +42,9 @@ const showtimeSchema = new Schema({
 });
 
 const scheduleSchema = new Schema({
-    showtimes: [showtimeSchema]
+    showtimes: [{ type: Schema.Types.ObjectId, ref: 'Showtime' }] // Chỉ chứa ObjectId của showtimeSchema
 });
+
 
 const ticketSchema = new Schema({
     film: { type: Schema.Types.ObjectId, ref: 'Film', required: true },
