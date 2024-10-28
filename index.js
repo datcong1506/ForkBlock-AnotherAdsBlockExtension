@@ -1,14 +1,6 @@
 const controller=require('./controllers/controller')
-
-const app=require('express')();
-const PORT=8080;
+const view=require("./views/views")
 
 
-
-
-app.listen(
-    PORT,
-    ()=>{
-        console.log(`it 's alive on http://localhost:${PORT}`)
-    }
-)
+controller.Init();
+view.Init()
