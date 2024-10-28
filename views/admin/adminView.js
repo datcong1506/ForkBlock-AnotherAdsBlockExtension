@@ -2,8 +2,11 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const adminRouters = express.Router();
 
-const appExtensions=require("../../extensions/appExtensions")
-var adminController=require("../../controllers/admin/admincontroller")
+const appExtensions=require("../../extensions/appExtensions");
+const cinemaController=require("../../controllers/cinema/cinemacontroller");
+const filmController=require("../../controllers/film/filmController");
+const showtimeController=require("../../controllers/showtime/showtimeController");
+
 adminRouters.post('/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -36,15 +39,10 @@ adminRouters.get('/verify', (req, res) => {
 
 adminRouters.use(appExtensions.VerifyToken);
 
-adminRouters.get("/helloadmin",(req,res)=>{
-  console.log("Okia");
-  return res.send({message:"heelo"});
-});
-
 const cinemaRouters=express.Router();
 cinemaRouters.post("/create",async (req,res)=>{
     try {
-      const cinema = await adminController.CreateCinema(req.body);
+      const cinema = await cinemaController.CreateCinema(req.body);
       res.status(201).json(cinema);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -54,7 +52,7 @@ cinemaRouters.post("/create",async (req,res)=>{
 // Route để lấy tất cả rạp chiếu
 cinemaRouters.get('/getAll', async (req, res) => {
   try {
-    const cinemas = await adminController.GetAllCinemas();
+    const cinemas = await cinemaController.GetAllCinemas();
     res.status(200).json(cinemas);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -65,7 +63,7 @@ cinemaRouters.get('/getAll', async (req, res) => {
 // Route để lấy nhiều rạp chiếu
 cinemaRouters.post('/getMultiple', async (req, res) => {
   try {
-    const cinemas = await adminController.GetCinemaByIds(req.body.ids);
+    const cinemas = await cinemaController.GetCinemaByIds(req.body.ids);
     res.status(200).json(cinemas);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -75,7 +73,7 @@ cinemaRouters.post('/getMultiple', async (req, res) => {
 // Route to update cinema by ID
 cinemaRouters.put('/update', async (req, res) => {
   try {
-    const cinema = await adminController.UpdateCinema(req.body.id, req.body);
+    const cinema = await cinemaController.UpdateCinema(req.body.id, req.body);
     res.status(200).json(cinema);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -100,7 +98,7 @@ const projectionRouters=express.Router();
 // Route để tạo phòng chiếu mới
 projectionRouters.post('/create', async (req, res) => {
   try {
-    const projection = await  adminController.CreateProjection(req.body.cinemaId, req.body);
+    const projection = await  cinemaController.CreateProjection(req.body.cinemaId, req.body);
     res.status(201).json(projection);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -110,7 +108,7 @@ projectionRouters.post('/create', async (req, res) => {
 // Route để cập nhật phòng chiếu
 projectionRouters.put('/update', async (req, res) => {
   try {
-    const projection = await adminController.UpdateProjection(req.body.id, req.body);
+    const projection = await cinemaController.UpdateProjection(req.body.id, req.body);
     res.status(200).json(projection);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -120,7 +118,7 @@ projectionRouters.put('/update', async (req, res) => {
 // Route để xóa phòng chiếu
 projectionRouters.delete('/delete', async (req, res) => {
   try {
-    const result = await adminController.DeleteProjection(req.body.id);
+    const result = await cinemaController.DeleteProjection(req.body.id);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -130,7 +128,7 @@ projectionRouters.delete('/delete', async (req, res) => {
 // Route để lấy nhiều phòng chiếu
 projectionRouters.post('/getMultiple', async (req, res) => {
   try {
-    const projections = await adminController.GetProjections(req.body.ids);
+    const projections = await cinemaController.GetProjections(req.body.ids);
     res.status(200).json(projections);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -140,7 +138,7 @@ projectionRouters.post('/getMultiple', async (req, res) => {
 // Route để lấy tất cả phòng chiếu từ danh sách các cinemaId
 projectionRouters.post('/getByCinemaIds', async (req, res) => {
   try {
-    const projections = await adminController.GetProjectionsByCinemaIds(req.body.cinemaIds);
+    const projections = await cinemaController.GetProjectionsByCinemaIds(req.body.cinemaIds);
     res.status(200).json(projections);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -149,8 +147,144 @@ projectionRouters.post('/getByCinemaIds', async (req, res) => {
 
 
 
+
+const filmRouters = express.Router();
+
+
+
+// Route để tạo mới một bộ phim
+filmRouters.post('/create', async (req, res) => {
+  try {
+    const film = await filmController.CreateFilm(req.body);
+    res.status(201).json(film);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để lấy danh sách tất cả các bộ phim
+filmRouters.get('/getAll', async (req, res) => {
+  try {
+    const films = await filmController.GetFilms();
+    res.status(200).json(films);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để lấy thông tin một bộ phim theo ID
+filmRouters.get('/get/:id', async (req, res) => {
+  try {
+    const film = await filmController.GetFilmById(req.params.id);
+    res.status(200).json(film);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để lấy thông tin nhiều bộ phim theo IDs
+filmRouters.post('/getMultiple', async (req, res) => {
+  try {
+    const films = await filmController.GetFilmByIds(req.body.ids);
+    res.status(200).json(films);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để cập nhật thông tin một bộ phim
+filmRouters.put('/update', async (req, res) => {
+  try {
+    const film = await filmController.UpdateFilm(req.body.id, req.body);
+    res.status(200).json(film);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để xóa một bộ phim
+filmRouters.delete('/delete', async (req, res) => {
+  try {
+    const result = await filmController.DeleteFilm(req.body.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
+
+const showtimeRouters = express.Router();
+
+// Route để tạo mới một showtime
+showtimeRouters.post('/create', async (req, res) => {
+  try {
+    const showtime = await showtimeController.CreateShowtime(req.body);
+    res.status(201).json(showtime);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để lấy danh sách tất cả các showtime
+showtimeRouters.get('/getAll', async (req, res) => {
+  try {
+    const showtimes = await showtimeController.GetShowtimes();
+    res.status(200).json(showtimes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để lấy thông tin một showtime theo ID
+showtimeRouters.get('/get/:id', async (req, res) => {
+  try {
+    const showtime = await showtimeController.GetShowtimeById(req.params.id);
+    res.status(200).json(showtime);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để lấy thông tin nhiều showtime theo IDs
+showtimeRouters.post('/getMultiple', async (req, res) => {
+  try {
+    const showtimes = await showtimeController.GetShowtimeByIds(req.body.ids);
+    res.status(200).json(showtimes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để cập nhật thông tin một showtime
+showtimeRouters.put('/update', async (req, res) => {
+  try {
+    const showtime = await showtimeController.UpdateShowtime(req.body.id, req.body);
+    res.status(200).json(showtime);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route để xóa một showtime
+showtimeRouters.delete('/delete', async (req, res) => {
+  try {
+    const result = await showtimeController.DeleteShowtime(req.body.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
+
+
+
 function Init(app) {
   if (app) {
+    cinemaRouters.use("/film",filmRouters);
     cinemaRouters.use("/projection",projectionRouters);
     adminRouters.use("/cinema",cinemaRouters);
     app.use('/admin', adminRouters);

@@ -1,5 +1,4 @@
 const model = require('../../models/model');
-
 // Hàm tạo mới một rạp chiếu
 async function CreateCinema(data) {
   const { name, location, description, logo } = data;
