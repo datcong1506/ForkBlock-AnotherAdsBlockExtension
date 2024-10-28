@@ -284,6 +284,7 @@ showtimeRouters.delete('/delete', async (req, res) => {
 
 function Init(app) {
   if (app) {
+    cinemaRouters.use("/showtime",showtimeRouters);
     cinemaRouters.use("/film",filmRouters);
     cinemaRouters.use("/projection",projectionRouters);
     adminRouters.use("/cinema",cinemaRouters);

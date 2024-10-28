@@ -31,11 +31,14 @@ const seatSchema = new Schema({
 
 
 const projectionSchema = new Schema({
-    name: { type: String, required: true, unique: true }, // Thêm unique: true
+    name: { type: String, required: true, unique: true },
     seats: [seatSchema],
     available: { type: Boolean, required: true, default: true },
-    cinema: { type: Schema.Types.ObjectId, ref: 'Cinema', required: true }
+    cinema: { type: Schema.Types.ObjectId, ref: 'Cinema', required: true },
+    regularPrice: { type: Number, required: true }, // Thêm trường giá vé bình thường
+    vipPrice: { type: Number, required: true } // Thêm trường giá vé VIP
 });
+
 
 
 const showtimeSchema = new Schema({
@@ -57,9 +60,15 @@ const ticketSchema = new Schema({
 });
 
 const userSchema = new Schema({
-    googleId: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    age: { type: Number, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true, unique: true },
+    password: { type: String, required: true }, // Thêm trường password
     ticketHistory: [{ type: Schema.Types.ObjectId, ref: 'Ticket' }] // Chứa ObjectId của ticketSchema
 });
+
+
 
 const adminSchema = new Schema({
     username: { type: String, required: true, unique: true },
