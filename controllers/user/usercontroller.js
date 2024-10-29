@@ -132,6 +132,12 @@ async function BuyTicket(userId, ticketData) {
     user.ticketHistory.push(newTicket._id);
     await user.save();
 
+    // Cập nhật trạng thái ghế về booked
+    await model.Projection.updateOne(
+      { _id: ticketData.room, 'seats._id': ticketData.seat },
+      { $set: { 'seats.$.booked': true } }
+    );
+
     return newTicket;
   } catch (err) {
     throw new Error(err.message);
