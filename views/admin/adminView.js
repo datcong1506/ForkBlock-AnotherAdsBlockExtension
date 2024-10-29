@@ -6,13 +6,13 @@ const appExtensions=require("../../extensions/appExtensions");
 const cinemaController=require("../../controllers/cinema/cinemacontroller");
 const filmController=require("../../controllers/film/filmController");
 const showtimeController=require("../../controllers/showtime/showtimeController");
-
+const adminSecretKey="secret_admin";
 adminRouters.post('/login', (req, res) => {
   const { username, password } = req.body;
 
   // Kiểm tra nếu username và password là "admin"
   if (username === 'admin' && password === 'admin') {
-    const token = jwt.sign({ username }, 'secret', { expiresIn: '168h' }); // 7 ngày
+    const token = jwt.sign({ username },adminSecretKey, { expiresIn: '168h' }); // 7 ngày
     return res.json({ token });
   }
 
@@ -26,7 +26,7 @@ adminRouters.get('/verify', (req, res) => {
     return res.status(403).send({ auth: false, message: 'No token provided.' });
   }
 
-  jwt.verify(token, 'secret', (err, decoded) => {
+  jwt.verify(token, adminSecretKey, (err, decoded) => {
     if (err) {
       return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
     }
@@ -37,7 +37,9 @@ adminRouters.get('/verify', (req, res) => {
 });
 
 
-adminRouters.use(appExtensions.VerifyToken);
+adminRouters.use((req,res,next)=>{
+  return appExtensions.VerifyToken(req,res,next,adminSecretKey);
+});
 
 const cinemaRouters=express.Router();
 cinemaRouters.post("/create",async (req,res)=>{

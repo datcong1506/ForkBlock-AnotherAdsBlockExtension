@@ -1,5 +1,7 @@
 const Joi = require('joi');
 const model = require('../../models/model');
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'your_secret_key'; // Thay bằng khóa bí mật của bạn
 
 // Định nghĩa schema Joi để xác thực
 const userSchema = Joi.object({
@@ -136,6 +138,19 @@ async function BuyTicket(userId, ticketData) {
   }
 }
 
+async function GetUserByToken(token) {
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const user = await model.User.findById(decoded.id);
+    if (!user) throw new Error('User không tồn tại');
+    return user;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+
+
 // Export các function
 module.exports = {
   CreateUser,
@@ -145,5 +160,6 @@ module.exports = {
   GetUserByIds,
   UpdateUser,
   DeleteUser,
-  BuyTicket // Export hàm BuyTicket
+  BuyTicket, // Export hàm BuyTicket,
+  GetUserByToken
 };

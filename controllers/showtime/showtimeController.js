@@ -51,11 +51,9 @@ async function UpdateShowtime(id, data) {
   try {
     const showtime = await model.Showtime.findById(id);
     if (!showtime) throw new Error('Showtime không tồn tại');
-
     showtime.film = film || showtime.film;
     showtime.room = room || showtime.room;
     showtime.time = time || showtime.time;
-
     await showtime.save();
     return showtime;
   } catch (err) {
@@ -68,9 +66,22 @@ async function DeleteShowtime(id) {
   try {
     const showtime = await model.Showtime.findById(id);
     if (!showtime) throw new Error('Showtime không tồn tại');
-
     await showtime.remove();
     return { message: 'Đã xóa showtime' };
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+// Hàm lấy tất cả các showtime trong ngày hiện tại
+async function GetDailyShowTimes() {
+  const today = new Date().toISOString().split('T')[0]; // Lấy ngày hiện tại ở định dạng YYYY-MM-DD
+  try {
+    const showtimes = await model.Showtime.find({
+      time: { $regex: `^${today}` },
+    });
+    if (showtimes.length === 0) throw new Error('Không tìm thấy showtime nào cho ngày hôm nay');
+    return showtimes;
   } catch (err) {
     throw new Error(err.message);
   }
@@ -83,5 +94,6 @@ module.exports = {
   GetShowtimeById,
   GetShowtimeByIds,
   UpdateShowtime,
-  DeleteShowtime
+  DeleteShowtime,
+  GetDailyShowTimes,
 };
