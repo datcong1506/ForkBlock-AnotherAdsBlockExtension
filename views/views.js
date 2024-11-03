@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const adminView = require('./admin/adminView');
 const guestView=require('./guest/guestView')
 const userView=require('./user/userView')
@@ -5,7 +7,7 @@ const userView=require('./user/userView')
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express() // Ensure the path to your views module is correct
-const PORT = 8080;
+const PORT = process.env.PORT;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // Ensure this is called as a function
