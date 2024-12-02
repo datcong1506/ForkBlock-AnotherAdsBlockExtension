@@ -1,4 +1,5 @@
 require('dotenv').config();
+var cors = require('cors')
 
 const adminView = require('./admin/adminView');
 const guestView=require('./guest/guestView')
@@ -9,6 +10,7 @@ const bodyParser = require('body-parser');
 const app = express() // Ensure the path to your views module is correct
 const PORT = process.env.PORT;
 
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // Ensure this is called as a function
 
