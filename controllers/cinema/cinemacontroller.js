@@ -58,7 +58,7 @@ async function DeleteCinema(id) {
         const cinema = await model.Cinema.findById(id);
         if (!cinema) throw new Error('Rạp chiếu không tồn tại');
 
-        await cinema.remove();
+        await cinema.deleteOne();
         return { message: 'Đã xóa rạp chiếu' };
     } catch (err) {
         throw new Error(err.message);
