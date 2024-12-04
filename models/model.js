@@ -35,8 +35,6 @@ const projectionSchema = new Schema({
     seats: [seatSchema],
     available: { type: Boolean, required: true, default: true },
     cinema: { type: Schema.Types.ObjectId, ref: 'Cinema', required: true },
-    regularPrice: { type: Number, required: true }, // Thêm trường giá vé bình thường
-    vipPrice: { type: Number, required: true } // Thêm trường giá vé VIP
 });
 
 

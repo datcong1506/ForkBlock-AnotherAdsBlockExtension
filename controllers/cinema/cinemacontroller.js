@@ -65,6 +65,21 @@ async function DeleteCinema(id) {
     }
 }
 
+async function GetAllProjections(cinema_ids) {
+    try {
+        let projections
+        if(cinema_ids.length) {
+            projections = await model.Projection.find({cinema: {$in: cinema_ids}})
+        } else {
+            projections = await model.Projection.find()
+        }
+
+        return projections
+    } catch (err) {
+        throw new Error(err.message);
+    }
+}
+
 // Hàm tạo phòng chiếu từ rạp chiếu
 async function CreateProjection(cinemaId, data) {
 
@@ -76,8 +91,6 @@ async function CreateProjection(cinemaId, data) {
         const newProjection = new model.Projection({ name, seats, available, cinema: cinema._id });
         await newProjection.save();
 
-        cinema.rooms.push(newProjection._id);
-        await cinema.save();
         return newProjection;
     } catch (err) {
         throw new Error(err.message);
@@ -111,7 +124,7 @@ async function DeleteProjection(projectionId) {
         const projection = await model.Projection.findById(projectionId);
         if (!projection) throw new Error('Phòng chiếu không tồn tại');
 
-        await projection.remove();
+        await projection.deleteOne();
         return { message: 'Đã xóa phòng chiếu' };
     } catch (err) {
         throw new Error(err.message);
@@ -167,5 +180,6 @@ module.exports = {
     DeleteProjection,
     GetProjections,
     GetProjectionsByCinemaIds,
-    GetAllCinemas
+    GetAllCinemas,
+    GetAllProjections
 };

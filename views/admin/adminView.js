@@ -127,6 +127,15 @@ projectionRouters.delete('/delete', async (req, res) => {
   }
 });
 
+projectionRouters.post('/getAll', async (req, res) => {
+  try {
+    const projections = await cinemaController.GetAllProjections(req.body.cinema_ids);
+    res.status(200).json(projections);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+})
+
 // Route để lấy nhiều phòng chiếu
 projectionRouters.post('/getMultiple', async (req, res) => {
   try {
