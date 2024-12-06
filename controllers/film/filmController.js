@@ -83,7 +83,7 @@ async function DeleteFilm(id) {
     const film = await model.Film.findById(id);
     if (!film) throw new Error('Bộ phim không tồn tại');
 
-    await film.remove();
+    await film.deleteOne();
     return { message: 'Đã xóa bộ phim' };
   } catch (err) {
     throw new Error(err.message);
