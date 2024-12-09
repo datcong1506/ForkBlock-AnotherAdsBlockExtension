@@ -31,18 +31,20 @@ const seatSchema = new Schema({
 
 
 const projectionSchema = new Schema({
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     seats: [seatSchema],
     available: { type: Boolean, required: true, default: true },
     cinema: { type: Schema.Types.ObjectId, ref: 'Cinema', required: true },
-});
+}).index({name: 1, cinema: 1}, {unique: true});
 
 
 
 const showtimeSchema = new Schema({
     film: { type: Schema.Types.ObjectId, ref: 'Film', required: true },
     room: { type: Schema.Types.ObjectId, ref: 'Projection', required: true },
-    time: { type: Date, required: true }
+    time: { type: Date, required: true },
+    vipPrice: {type: Number, required: true},
+    regularPrice: {type: Number, required: true}
 });
 
 const scheduleSchema = new Schema({

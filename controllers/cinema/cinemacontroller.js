@@ -145,10 +145,10 @@ async function GetProjections(projectionIds) {
 
 async function GetProjectionsByCinemaIds(cinemaIds) {
     try {
-        const cinemas = await model.Cinema.find({ _id: { $in: cinemaIds } }).select('rooms');
-        const projectionIds = cinemas.reduce((acc, cinema) => acc.concat(cinema.rooms), []);
+        // const cinemas = await model.Cinema.find({ _id: { $in: cinemaIds } }).select('rooms');
+        // const projectionIds = cinemas.reduce((acc, cinema) => acc.concat(cinema.rooms), []);
 
-        const projections = await model.Projection.find({ _id: { $in: projectionIds } });
+        const projections = await model.Projection.find({ cinema: { $in: cinemaIds } });
         if (projections.length === 0) throw new Error('Không tìm thấy phòng chiếu nào');
 
         return projections;

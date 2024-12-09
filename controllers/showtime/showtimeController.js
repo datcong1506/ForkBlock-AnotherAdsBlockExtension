@@ -2,9 +2,9 @@ const model = require('../../models/model');
 
 // Hàm tạo mới một showtime
 async function CreateShowtime(data) {
-  const { film, room, time } = data;
+  const { film, room, time, vipPrice, regularPrice } = data;
   try {
-    const newShowtime = new model.Showtime({ film, room, time });
+    const newShowtime = new model.Showtime({ film, room, time,vipPrice, regularPrice });
     await newShowtime.save();
     return newShowtime;
   } catch (err) {
@@ -15,7 +15,7 @@ async function CreateShowtime(data) {
 // Hàm lấy danh sách tất cả các showtime
 async function GetShowtimes() {
   try {
-    const showtimes = await model.Showtime.find();
+    const showtimes = await model.Showtime.find().populate(['film', {path: 'room', populate: 'cinema'}]);
     if (showtimes.length === 0) throw new Error('Không tìm thấy showtime nào');
     return showtimes;
   } catch (err) {
@@ -66,7 +66,7 @@ async function DeleteShowtime(id) {
   try {
     const showtime = await model.Showtime.findById(id);
     if (!showtime) throw new Error('Showtime không tồn tại');
-    await showtime.remove();
+    await showtime.deleteOne();
     return { message: 'Đã xóa showtime' };
   } catch (err) {
     throw new Error(err.message);
