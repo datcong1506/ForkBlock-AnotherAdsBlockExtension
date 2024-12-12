@@ -12,7 +12,7 @@ const userSchema = Joi.object({
   password: Joi.string().min(6).required(), // Thêm trường password
   ticketHistory: Joi.array().items(Joi.string().hex().length(24)) // Định dạng ObjectId
 });
-
+// fix bug
 // Hàm tạo mới một user
 async function CreateUser(data) {
   const { error, value } = userSchema.validate(data);
