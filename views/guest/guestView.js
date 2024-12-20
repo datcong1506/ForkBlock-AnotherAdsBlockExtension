@@ -83,6 +83,15 @@ guestRouters.get('/showTime/daily', async (req, res) => {
     }
 });
 
+guestRouters.post('/showtime/film', async (req, res) => {
+    try {
+        const showtime = await showtimeController.GetShowtimeByFilmId(req.body.idFilm, req.body.time);
+        res.status(200).json(showtime);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 
 function Init(app) {
