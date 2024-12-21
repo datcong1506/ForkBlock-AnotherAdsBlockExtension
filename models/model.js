@@ -30,6 +30,8 @@ const seatSchema = new Schema({
 });
 
 
+// FIX this
+
 const projectionSchema = new Schema({
     name: { type: String, required: true },
     seats: [seatSchema],
