@@ -46,7 +46,12 @@ async function GetFilmById(id) {
 // Hàm lấy thông tin nhiều bộ phim theo IDs
 async function GetFilmByIds(ids) {
   try {
-    const films = await model.Film.find({ _id: { $in: ids } });
+    let films = [];
+    if(ids.length) {
+      films = await model.Film.find({ _id: { $in: ids } });
+    } else {
+      films = await model.Film.find();
+    }
     if (films.length === 0) throw new Error('Không tìm thấy bộ phim nào');
     return films;
   } catch (err) {
