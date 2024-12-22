@@ -11,13 +11,15 @@ const SECRET_KEY = 'your_secret_key'; // Thay bằng khóa bí mật của bạn
 // Route để đăng ký user mới
 guestRouters.post('/register', async (req, res) => {
     try {
-        const { name, age, email, phone, password } = req.body;
+        const { name, age, email, password } = req.body;
 
         // Mã hóa mật khẩu
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await userController.CreateUser({ name, age, email, phone, password: hashedPassword });
-        res.status(201).json(newUser);
+        const newUser = await userController.CreateUser({ name, age, email, password: hashedPassword });
+        // Tạo JWT token
+        const token = jwt.sign({ id: newUser._id }, SECRET_KEY, { expiresIn: '999h' });
+        res.status(201).json({user: newUser, token});
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -39,7 +41,7 @@ guestRouters.post('/login', async (req, res) => {
         // Tạo JWT token
         const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '999h' });
 
-        res.json({ token });
+        res.json({ token, user });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -67,6 +69,15 @@ guestRouters.post('/projection/getMultiple', async (req, res) => {
 guestRouters.post('/film/getMultiple', async (req, res) => {
     try {
         const films = await filmController.GetFilmByIds(req.body.ids);
+        res.status(200).json(films);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+guestRouters.post('/film/byCategory', async (req, res) => {
+    try {
+        const films = await filmController.GetFilmByCategory(req.body.cate);
         res.status(200).json(films);
     } catch (err) {
         res.status(500).json({ message: err.message });

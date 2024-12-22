@@ -43,6 +43,16 @@ async function GetFilmById(id) {
   }
 }
 
+async function GetFilmByCategory(cate) {
+  try {
+    const film = await model.Film.find({genre: cate});
+    if (!film) throw new Error('Bộ phim không tồn tại');
+    return film;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
 // Hàm lấy thông tin nhiều bộ phim theo IDs
 async function GetFilmByIds(ids) {
   try {
@@ -102,5 +112,6 @@ module.exports = {
   GetFilmById,
   GetFilmByIds,
   UpdateFilm,
-  DeleteFilm
+  DeleteFilm,
+  GetFilmByCategory
 };
