@@ -6,7 +6,7 @@ const dbHOST=process.env.DB_HOST;
 
 function Init(){
     console.log(`db init at ${dbHOST}`);
-    mongoose.connect(dbHOST, { useNewUrlParser: true, useUnifiedTopology: true })
+    mongoose.connect(dbHOST)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('MongoDB connection error:', err));
 }
