@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const filmSchema = new Schema({
     title: { type: String, required: true },
     genre: {
-        type: String, required: true,
+        type: [String], required: true,
         enum: ['Hành động', 'Kinh dị', 'Viễn tưởng', 'Lãng mạn', 'Hài hước', 'Phiêu lưu', 'Thần thoại', 'Hoạt hình', 'Tài liệu', 'Kịch tính', 'Chiến tranh', 'Thể thao', 'Nhạc kịch']
     },
     duration: { type: Number, required: true }, // in seconds
