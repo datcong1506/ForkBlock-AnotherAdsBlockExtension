@@ -8,9 +8,7 @@ const userSchema = Joi.object({
   name: Joi.string().required(),
   age: Joi.number().required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().pattern(new RegExp('^[0-9]{10,15}$')).required(), // Định dạng sdt phải từ 10 đến 15 chữ số
   password: Joi.string().min(6).required(), // Thêm trường password
-  ticketHistory: Joi.array().items(Joi.string().hex().length(24)) // Định dạng ObjectId
 });
 // fix bug
 // Hàm tạo mới một user
@@ -21,10 +19,7 @@ async function CreateUser(data) {
   try {
     // Kiểm tra xem có user nào trùng email hoặc số điện thoại không
     const existingUser = await model.User.findOne({
-      $or: [
-        { email: value.email },
-        { phone: value.phone }
-      ]
+         email: value.email 
     });
 
     if (existingUser) {
@@ -87,18 +82,13 @@ async function GetUserByIds(ids) {
 
 // Hàm cập nhật thông tin một user theo ID
 async function UpdateUser(id, data) {
-  const { error, value } = userSchema.validate(data);
-  if (error) throw new Error(error.details[0].message);
-
   try {
     const user = await model.User.findById(id);
     if (!user) throw new Error('User không tồn tại');
 
-    user.name = value.name || user.name;
-    user.age = value.age || user.age;
-    user.email = value.email || user.email;
-    user.phone = value.phone || user.phone;
-    user.ticketHistory = value.ticketHistory || user.ticketHistory;
+    user.name = data.name || user.name;
+    user.age = data.age || user.age;
+    user.email = data.email || user.email;
 
     await user.save();
     return user;
@@ -121,28 +111,28 @@ async function DeleteUser(id) {
 }
 
 // Hàm mua vé
-async function BuyTicket(userId, ticketData) {
-  try {
-    const user = await model.User.findById(userId);
-    if (!user) throw new Error('User không tồn tại');
+// async function BuyTicket(userId, ticketData) {
+//   try {
+//     const user = await model.User.findById(userId);
+//     if (!user) throw new Error('User không tồn tại');
 
-    const newTicket = new model.Ticket(ticketData);
-    await newTicket.save();
+//     const newTicket = new model.Ticket(ticketData);
+//     await newTicket.save();
 
-    user.ticketHistory.push(newTicket._id);
-    await user.save();
+//     user.ticketHistory.push(newTicket._id);
+//     await user.save();
 
-    // Cập nhật trạng thái ghế về booked
-    await model.Projection.updateOne(
-      { _id: ticketData.room, 'seats._id': ticketData.seat },
-      { $set: { 'seats.$.booked': true } }
-    );
+//     // Cập nhật trạng thái ghế về booked
+//     await model.Projection.updateOne(
+//       { _id: ticketData.room, 'seats._id': ticketData.seat },
+//       { $set: { 'seats.$.booked': true } }
+//     );
 
-    return newTicket;
-  } catch (err) {
-    throw new Error(err.message);
-  }
-}
+//     return newTicket;
+//   } catch (err) {
+//     throw new Error(err.message);
+//   }
+// }
 
 async function GetUserByToken(token) {
   try {
@@ -150,6 +140,57 @@ async function GetUserByToken(token) {
     const user = await model.User.findById(decoded.id);
     if (!user) throw new Error('User không tồn tại');
     return user;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+async function getTicketBookedBySchedulerId(id) {
+  try {
+    const booked = await model.Ticket.find({ showtime: id, state: {$ne: 4} });
+    return booked;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+async function buyTicket({userId, schedulerId, seatName}) {
+  try {
+    const user = await model.User.findById(userId);
+    if (!user) throw new Error('User không tồn tại');
+
+    const newTicket = new model.Ticket({
+      seat: seatName,
+      showtime: schedulerId,
+      user: userId,
+      state: 1
+    });
+    await newTicket.save();
+
+    return newTicket
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+async function rejectTicket(id) {
+  try {
+    const date = new Date()
+    const ticket = await model.Ticket.findByIdAndUpdate(id, {state: 4, rejectAt: date})
+    return ticket
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+async function getTicket(state, userId) {
+  try {
+    const user = await model.User.findById(userId);
+    if (!user) throw new Error('User không tồn tại');
+
+    const tickets = await model.Ticket.find({ user: userId, state }).populate([{path: 'showtime', populate: ['film', {path: 'room', populate: ['cinema']}]}]);
+
+    return tickets
   } catch (err) {
     throw new Error(err.message);
   }
@@ -166,6 +207,9 @@ module.exports = {
   GetUserByIds,
   UpdateUser,
   DeleteUser,
-  BuyTicket, // Export hàm BuyTicket,
-  GetUserByToken
+  buyTicket, // Export hàm BuyTicket,
+  GetUserByToken,
+  getTicketBookedBySchedulerId,
+  getTicket,
+  rejectTicket
 };

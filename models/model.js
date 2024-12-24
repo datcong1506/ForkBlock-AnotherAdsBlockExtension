@@ -49,15 +49,13 @@ const showtimeSchema = new Schema({
     regularPrice: {type: Number, required: true}
 });
 
-const scheduleSchema = new Schema({
-    showtimes: [{ type: Schema.Types.ObjectId, ref: 'Showtime' }] // Chỉ chứa ObjectId của showtimeSchema
-});
-
 const ticketSchema = new Schema({
-    film: { type: Schema.Types.ObjectId, ref: 'Film', required: true },
     showtime: { type: Schema.Types.ObjectId, ref: 'Showtime', required: true },
     seat: { type: String, required: true },
+    buyAt: { type: Date, required: true, default: Date.now },
     purchasedAt: { type: Date, required: true, default: Date.now },
+    rejectAt: { type: Date, required: true, default: Date.now },
+    state: {type: Number, required: true, default: 1, enum: [1,2,4]}, // 1: order, 2: done, 4: reject
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true } // Thêm trường này để thể hiện thuộc về người dùng nào
 });
 
@@ -65,9 +63,7 @@ const userSchema = new Schema({
     name: { type: String, required: true },
     age: { type: Number, required: true },
     email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true, unique: true },
     password: { type: String, required: true }, // Thêm trường password
-    ticketHistory: [{ type: Schema.Types.ObjectId, ref: 'Ticket' }] // Chứa ObjectId của ticketSchema
 });
 
 
@@ -82,7 +78,6 @@ const Cinema = mongoose.model('Cinema', cinemaSchema);
 const Seat = mongoose.model('Seat', seatSchema);
 const Projection = mongoose.model('Projection', projectionSchema);
 const Showtime = mongoose.model('Showtime', showtimeSchema);
-const Schedule = mongoose.model('Schedule', scheduleSchema);
 const Ticket = mongoose.model('Ticket', ticketSchema);
 const User = mongoose.model('User', userSchema);
 const Admin = mongoose.model('Admin', adminSchema);
@@ -93,7 +88,6 @@ module.exports = {
     Seat,
     Projection,
     Showtime,
-    Schedule,
     Ticket,
     User,
     Admin

@@ -26,7 +26,7 @@ async function GetShowtimes() {
 // Hàm lấy thông tin một showtime theo ID
 async function GetShowtimeById(id) {
   try {
-    const showtime = await model.Showtime.findById(id);
+    const showtime = await model.Showtime.findById(id).populate(['film', {path: 'room', populate: 'cinema'}]);
     if (!showtime) throw new Error('Showtime không tồn tại');
     return showtime;
   } catch (err) {

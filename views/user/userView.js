@@ -36,6 +36,46 @@ userRouters.post('/film/getMultiple', async (req, res) => {
     }
 });
 
+userRouters.post('/showtime/get',  async (req, res) => {
+    try {
+        const showtime = await showtimeController.GetShowtimeById(req.body.id);
+        res.status(200).json(showtime);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
+userRouters.post('/ticket/booked-scheduler',  async (req, res) => {
+    try {
+        const booked = await userController.getTicketBookedBySchedulerId(req.body.id);
+        res.status(200).json(booked);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
+userRouters.post('/ticket/buy',  async (req, res) => {
+    try {
+        const booked = await userController.buyTicket(req.body);
+        res.status(200).json(booked);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
+userRouters.post('/ticket/reject',  async (req, res) => {
+    try {
+        const ticket = await userController.rejectTicket(req.body.id);
+        res.status(200).json(ticket);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
+userRouters.post('/ticket/state',  async (req, res) => {
+    try {
+        const booked = await userController.getTicket(req.body.state, req.body.userId);
+        res.status(200).json(booked);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
 
 userRouters.get('/showTime/daily', async (req, res) => {
     try {
