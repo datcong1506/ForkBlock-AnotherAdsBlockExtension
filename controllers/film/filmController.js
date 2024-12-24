@@ -45,7 +45,7 @@ async function GetFilmById(id) {
 
 async function GetFilmByCategory(cate) {
   try {
-    const film = await model.Film.find({genre: cate});
+    const film = await model.Film.find({ genre: { $in: [cate] } });
     if (!film) throw new Error('Bộ phim không tồn tại');
     return film;
   } catch (err) {
