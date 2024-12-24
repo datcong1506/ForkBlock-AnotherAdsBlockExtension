@@ -154,6 +154,15 @@ async function getTicketBookedBySchedulerId(id) {
   }
 }
 
+async function getTicketBySchedulerId(id) {
+  try {
+    const booked = await model.Ticket.find({ showtime: id }).populate(['user', {path:'showtime', populate: ['film', {path: 'room', populate: 'cinema'}]}]);
+    return booked;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
 async function buyTicket({userId, schedulerId, seatName}) {
   try {
     const user = await model.User.findById(userId);
@@ -177,6 +186,16 @@ async function rejectTicket(id) {
   try {
     const date = new Date()
     const ticket = await model.Ticket.findByIdAndUpdate(id, {state: 4, rejectAt: date})
+    return ticket
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+async function doneTicket(id) {
+  try {
+    const date = new Date()
+    const ticket = await model.Ticket.findByIdAndUpdate(id, {state: 2, purchasedAt: date})
     return ticket
   } catch (err) {
     throw new Error(err.message);
@@ -211,5 +230,7 @@ module.exports = {
   GetUserByToken,
   getTicketBookedBySchedulerId,
   getTicket,
-  rejectTicket
+  rejectTicket,
+  getTicketBySchedulerId,
+  doneTicket
 };

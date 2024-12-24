@@ -1,11 +1,13 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const adminRouters = express.Router();
 
 const appExtensions=require("../../extensions/appExtensions");
 const cinemaController=require("../../controllers/cinema/cinemacontroller");
 const filmController=require("../../controllers/film/filmController");
 const showtimeController=require("../../controllers/showtime/showtimeController");
+const userController =require("../../controllers/user/usercontroller")
 const adminSecretKey="secret_admin";
 adminRouters.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -36,6 +38,46 @@ adminRouters.get('/verify', (req, res) => {
   });
 });
 
+adminRouters.get('/user/getAll',async (req, res) => {
+    try {
+      const cinema = await userController.GetAllUsers();
+      res.status(200).json(cinema);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+})
+
+adminRouters.post('/user/create',async (req, res) => {
+  try {
+    const { name, age, email, password } = req.body;
+
+    // Mã hóa mật khẩu
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await userController.CreateUser({ name, age, email, password: hashedPassword });
+    res.status(200).json(newUser);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+})
+
+adminRouters.post('/ticket/by-schedule',async (req, res) => {
+  try {
+    const ticket = await userController.getTicketBySchedulerId(req.body.id);
+    res.status(200).json(ticket);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+})
+
+adminRouters.post('/ticket/done',async (req, res) => {
+  try {
+    const ticket = await userController.doneTicket(req.body.id);
+    res.status(200).json(ticket);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+})
 
 adminRouters.use((req,res,next)=>{
   return appExtensions.VerifyToken(req,res,next,adminSecretKey);
