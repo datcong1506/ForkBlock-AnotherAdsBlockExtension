@@ -87,16 +87,19 @@ async function GetDailyShowTimes() {
   }
 }
 
-async function GetShowtimeByFilmId(idFilm, time) {
+async function GetShowtimeByFilmId(idFilm, time, location) {
 
   try {
     const date = new Date(time);
     const startOfDay = new Date(date.setHours(0, 0, 0, 0));
     const endOfDay = new Date(date.setHours(23, 59, 59, 999));
-    const showtimes = await model.Showtime.find({
-      film: idFilm,
-      time: { $gte: startOfDay, $lt: endOfDay },
-    }).populate(['film', {path: 'room', populate: 'cinema'}]);
+    let showtimes = await model.Showtime.find({
+        film: idFilm,
+        time: { $gte: startOfDay, $lt: endOfDay },
+      }).populate(['film', {path: 'room', populate: 'cinema'}]);
+    if(location !== 'Tất cả') {
+      showtimes = showtimes.filter(s => s?.room?.cinema?.location === location)
+    }
     if (showtimes.length === 0) throw new Error('Không tìm thấy showtime nào cho ngày hôm nay');
     return showtimes;
   } catch (err) {
