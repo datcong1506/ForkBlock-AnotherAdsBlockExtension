@@ -93,9 +93,13 @@ async function GetShowtimeByFilmId(idFilm, time, location) {
     const date = new Date(time);
     const startOfDay = new Date(date.setHours(0, 0, 0, 0));
     const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+    const offset = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
+    const startOfDayUTC = new Date(startOfDay.getTime() - offset);
+    const endOfDayUTC = new Date(endOfDay.getTime() - offset);
+    
     let showtimes = await model.Showtime.find({
         film: idFilm,
-        time: { $gte: startOfDay, $lt: endOfDay },
+        time: { $gte: startOfDayUTC, $lt: endOfDayUTC },
       }).populate(['film', {path: 'room', populate: 'cinema'}]);
     if(location !== 'Tất cả') {
       showtimes = showtimes.filter(s => s?.room?.cinema?.location === location)
