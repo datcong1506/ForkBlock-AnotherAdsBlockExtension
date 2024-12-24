@@ -26,6 +26,7 @@
     "oauth": "^0.10.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "vietnam-qr-pay": "^1.4.0"
   }
 }

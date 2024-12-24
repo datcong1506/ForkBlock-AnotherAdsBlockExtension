@@ -7,6 +7,7 @@ const filmController = require("../../controllers/film/filmController");
 const showtimeController = require("../../controllers/showtime/showtimeController");
 const userRouters = express.Router();
 const SECRET_KEY = 'your_secret_key'; // Thay bằng khóa bí mật của bạn
+const { QRPay, BanksObject } = require('vietnam-qr-pay')
 
 // Route để lấy tất cả rạp chiếu
 userRouters.get('/cinema/getAll', async (req, res) => {
@@ -55,6 +56,18 @@ userRouters.post('/ticket/booked-scheduler',  async (req, res) => {
 userRouters.post('/ticket/buy',  async (req, res) => {
     try {
         const booked = await userController.buyTicket(req.body);
+        var showtimeData=await showtimeController.GetShowtimeById(booked.showtime);
+        var projection=await cinemaController.GetProjections([showtimeData.room]);
+        var seat = seats.find(seat => seat._id ===booked.seat);
+        var price=seat.type=="VIP"?showtimeData.vipPrice:showtimeData.regularPrice;
+        const qrPay = QRPay.initVietQR({
+            bankBin: BanksObject.vietinbank.bin,
+            bankNumber: '103870479837',
+            amount:price.toString(),
+            purpose:booked._id,
+        
+        });
+        booked.qrCodeGen=qrPay.build();
         res.status(200).json(booked);
     } catch (err) {
         res.status(500).json({ message: err.message });
